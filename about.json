@@ -2,7 +2,7 @@
 	"name": "Discourse Dark Mode",
 	"component": true,
 	"about_url": null,
-	"license_url": null,
+	"license_url": "https://github.com/pmusaraj/discourse-dark-mode/blob/master/LICENSE",
 	"assets": {},
 	"color_schemes": {}
 }

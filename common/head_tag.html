@@ -4,11 +4,17 @@ const currentUser = api.getCurrentUser();
 const LocalStorageName = "disableDarkMode";
 
 const mql = window.matchMedia("(prefers-color-scheme: dark)");
-const darkThemeId = settings.dark_theme_id;
+const darkThemeId = parseInt(settings.dark_theme_id);
 
 function defaultThemeId() {
   const themes = Discourse.Site._current.user_themes;
-  return themes.filter(theme => theme.default === true)[0].theme_id;
+  let default_theme = themes.filter(theme => theme.default === true)[0];
+
+  if (default_theme.theme_id) {
+  	return parseInt(default_theme.theme_id);
+  } 
+
+  return -1;
 }
 
 function darkModeDisabled() {
@@ -22,16 +28,18 @@ function darkModeDisabled() {
 function toggleDarkTheme(e) {
   if (
     darkModeDisabled() ||
-    darkThemeId == "" ||
-    defaultThemeId() == darkThemeId
+    !darkThemeId ||
+    defaultThemeId() === darkThemeId
   ) {
     return;
   }
 
+  let currentThemeId = themeSelector.currentThemeId();
+
   if (
     currentUser &&
     mql.matches &&
-    themeSelector.currentThemeId() != darkThemeId
+	currentThemeId !== darkThemeId
   ) {
     setTheme(currentUser, darkThemeId);
   }
@@ -39,9 +47,9 @@ function toggleDarkTheme(e) {
   if (
     currentUser &&
     !mql.matches &&
-    themeSelector.currentThemeId() == darkThemeId
+    currentThemeId === darkThemeId
   ) {
-    setTheme(currentUser, defaultThemeId);
+    setTheme(currentUser, defaultThemeId());
   }
 }
 
@@ -61,7 +69,6 @@ mql.addListener(toggleDarkTheme);
 
 if (currentUser) {
   currentUser.disableDarkMode = darkModeDisabled();
-  console.log(darkModeDisabled());
   // very hacky, need to think of something cleaner here
   currentUser._isCurrent = true;
 }
