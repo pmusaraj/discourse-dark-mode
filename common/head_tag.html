@@ -1,0 +1,90 @@
+<script type="text/discourse-plugin" version="0.8">
+var themeSelector = require("discourse/lib/theme-selector");
+const currentUser = api.getCurrentUser();
+const LocalStorageName = "disableDarkMode";
+
+const mql = window.matchMedia("(prefers-color-scheme: dark)");
+const darkThemeId = settings.dark_theme_id;
+
+function defaultThemeId() {
+  const themes = Discourse.Site._current.user_themes;
+  return themes.filter(theme => theme.default === true)[0].theme_id;
+}
+
+function darkModeDisabled() {
+  let pref = localStorage.getItem(LocalStorageName);
+  if (pref !== null && pref === "true") {
+    return true;
+  }
+  return false;
+}
+
+function toggleDarkTheme(e) {
+  if (
+    darkModeDisabled() ||
+    darkThemeId == "" ||
+    defaultThemeId() == darkThemeId
+  ) {
+    return;
+  }
+
+  if (
+    currentUser &&
+    mql.matches &&
+    themeSelector.currentThemeId() != darkThemeId
+  ) {
+    setTheme(currentUser, darkThemeId);
+  }
+
+  if (
+    currentUser &&
+    !mql.matches &&
+    themeSelector.currentThemeId() == darkThemeId
+  ) {
+    setTheme(currentUser, defaultThemeId);
+  }
+}
+
+function setTheme(currentUser, themeId) {
+  currentUser.findDetails().then(user => {
+    seq = user.get("user_option.theme_key_seq");
+    themeSelector.setLocalTheme([themeId], seq);
+    window.location.reload();
+  });
+}
+
+window.onload = function() {
+  toggleDarkTheme();
+};
+
+mql.addListener(toggleDarkTheme);
+
+if (currentUser) {
+  currentUser.disableDarkMode = darkModeDisabled();
+  console.log(darkModeDisabled());
+  // very hacky, need to think of something cleaner here
+  currentUser._isCurrent = true;
+}
+
+api.modifyClass("controller:preferences/interface", {
+  actions: {
+    save() {
+      this._super();
+      if (this.get("model.username") !== currentUser.get("username")) {
+        return;
+      }
+      localStorage.setItem(
+        LocalStorageName,
+        this.get("model.disableDarkMode").toString()
+      );
+    }
+  }
+});
+
+</script>
+
+<script type='text/x-handlebars' data-template-name='/connectors/user-preferences-interface/add-darkmode-checkbox'>
+  {{#if model._isCurrent}}
+  {{preference-checkbox labelKey=(theme-prefix 'darkmode.disable_dark_mode') checked=model.disableDarkMode}}
+  {{/if}}
+</script>

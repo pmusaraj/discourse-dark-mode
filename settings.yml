@@ -1,0 +1,3 @@
+dark_theme_id:
+  default: ""
+  description: "Enter the ID of your site's dark theme."
