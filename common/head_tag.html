@@ -3,11 +3,10 @@ var themeSelector = require("discourse/lib/theme-selector");
 const currentUser = api.getCurrentUser();
 const LocalStorageName = "disableDarkMode";
 
-const mql = window.matchMedia("(prefers-color-scheme: dark)");
-const darkThemeId = parseInt(settings.dark_theme_id);
+const browserInDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
+const themes = Discourse.Site._current.user_themes;
 
 function defaultThemeId() {
-  const themes = Discourse.Site._current.user_themes;
   let default_theme = themes.filter(theme => theme.default === true)[0];
 
   if (default_theme.theme_id) {
@@ -26,29 +25,24 @@ function darkModeDisabled() {
 }
 
 function toggleDarkTheme(e) {
-  if (
-    darkModeDisabled() ||
-    !darkThemeId ||
-    defaultThemeId() === darkThemeId
-  ) {
+  let darkThemeId = parseInt(settings.dark_theme_id);
+
+  if (darkModeDisabled() || !darkThemeId || defaultThemeId() === darkThemeId) {
+    return;
+  }
+
+  let dark_theme = themes.filter(theme => theme.theme_id === darkThemeId);
+  if (dark_theme.length !== 1) {
     return;
   }
 
   let currentThemeId = themeSelector.currentThemeId();
 
-  if (
-    currentUser &&
-    mql.matches &&
-	currentThemeId !== darkThemeId
-  ) {
+  if (currentUser && browserInDarkMode.matches && currentThemeId !== darkThemeId) {
     setTheme(currentUser, darkThemeId);
   }
 
-  if (
-    currentUser &&
-    !mql.matches &&
-    currentThemeId === darkThemeId
-  ) {
+  if (currentUser && !browserInDarkMode.matches && currentThemeId === darkThemeId) {
     setTheme(currentUser, defaultThemeId());
   }
 }
@@ -65,7 +59,7 @@ window.onload = function() {
   toggleDarkTheme();
 };
 
-mql.addListener(toggleDarkTheme);
+browserInDarkMode.addListener(toggleDarkTheme);
 
 if (currentUser) {
   currentUser.disableDarkMode = darkModeDisabled();
