@@ -5,7 +5,7 @@ const LocalStorageName = "disableDarkMode";
 
 const browserInDarkMode = window.matchMedia("(prefers-color-scheme: dark)");
 const themes = Discourse.Site._current.user_themes;
-console.log(themes);
+
 function defaultThemeId() {
   let default_theme = themes.filter(theme => theme.default === true)[0];
 
