@@ -60,10 +60,6 @@ function setTheme(currentUser, themeId) {
   });
 }
 
-window.onload = function() {
-  toggleDarkTheme();
-};
-
 browserInDarkMode.addListener(toggleDarkTheme);
 
 if (currentUser) {
@@ -85,6 +81,14 @@ api.modifyClass("controller:preferences/interface", {
       );
     }
   }
+});
+
+var domReady = function(callback) {
+    document.readyState === "interactive" || document.readyState === "complete" ? callback() : document.addEventListener("DOMContentLoaded", callback);
+};
+
+domReady(function() {
+  toggleDarkTheme();
 });
 
 </script>
