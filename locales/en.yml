@@ -1,3 +1,6 @@
 en:
   darkmode:
-    disable_dark_mode: Disable automatic Dark Mode theme switching (Safari only)
+    disable_dark_mode: Disable automatic Dark Mode theme switching
+    enable_dark_mode: Enable automatic Dark Mode theme switching
+    modal_title: Switching themes
+    modal_body: Please wait while the page reloads...

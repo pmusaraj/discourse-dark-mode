@@ -1,3 +1,7 @@
 dark_theme_id:
   default: ""
   description: "Enter the ID of your site's dark theme."
+dark_theme_switch_on_by_default:
+  type: bool
+  default: true
+  description: "When checked, dark theme switching is enabled for all users unless they opt out in their user preferences. If unchecked, users need to enable dark mode theme switching in their preferences."
