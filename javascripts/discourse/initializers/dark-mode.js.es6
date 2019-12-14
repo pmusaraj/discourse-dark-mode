@@ -26,10 +26,10 @@ export default {
 				return -1;
 			}
 
-			function darkModeDisabled(key) {
-				const pref = localStorage.getItem(key);
+			function switchingDisabled() {
+				const pref = localStorage.getItem(selectedUserSetting);
 
-				if (key === "disableDarkMode") {
+				if (selectedUserSetting === "disableDarkMode") {
 					if (pref !== null && pref === "true") {
 						return true;
 					}
@@ -43,48 +43,53 @@ export default {
 			}
 
 			function toggleDarkTheme(e) {
-				let darkThemeId = parseInt(settings.dark_theme_id);
+				const darkThemeId = parseInt(settings.dark_theme_id),
+					currentThemeId = themeSelector.currentThemeId();
 
 				if (
-					darkModeDisabled(selectedUserSetting) ||
+					switchingDisabled() ||
 					!darkThemeId ||
-					defaultThemeId() === darkThemeId
+					defaultThemeId() === darkThemeId ||
+					!currentUser
 				) {
 					return;
 				}
 
-				let dark_theme = themes.filter(theme => theme.theme_id === darkThemeId);
+				const dark_theme = themes.filter(
+					theme => theme.theme_id === darkThemeId
+				);
 				if (dark_theme.length !== 1) {
 					return;
 				}
 
-				let currentThemeId = themeSelector.currentThemeId();
-
 				if (
-					currentUser &&
 					browserInDarkMode.matches &&
 					currentThemeId !== darkThemeId &&
 					currentThemeId === defaultThemeId()
 				) {
-					setTheme(currentUser, darkThemeId);
+					setTheme(darkThemeId);
 				}
 
-				if (
-					currentUser &&
-					!browserInDarkMode.matches &&
-					currentThemeId === darkThemeId
-				) {
-					setTheme(currentUser, defaultThemeId());
+				if (!browserInDarkMode.matches && currentThemeId === darkThemeId) {
+					setTheme(defaultThemeId());
 				}
 			}
 
-			function setTheme(currentUser, themeId) {
-				currentUser.findDetails().then(user => {
-					const seq = user.get("user_option.theme_key_seq");
-					themeSelector.setLocalTheme([themeId], seq);
-					showModal("dark-mode-modal");
-					window.location.reload();
-				});
+			function setTheme(themeId) {
+				setTimeout(function() {
+					// delay and visibilityState check
+					// needed because of a Safari iOS bug
+					// that triggers matchMedia listener
+					// while turning off screen
+					if (document.visibilityState !== "hidden") {
+						currentUser.findDetails().then(user => {
+							const seq = user.get("user_option.theme_key_seq");
+							themeSelector.setLocalTheme([themeId], seq);
+							showModal("dark-mode-modal");
+							window.location.reload();
+						});
+					}
+				}, 500);
 			}
 
 			browserInDarkMode.addListener(toggleDarkTheme);
