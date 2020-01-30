@@ -1,0 +1,7 @@
+{{#if isCurrentUser}}
+	{{#if darkThemeSwitchOnByDefault}}
+  	{{preference-checkbox labelKey=(theme-prefix 'darkmode.disable_dark_mode') checked=model.disableDarkMode}}
+  {{else}}
+  	{{preference-checkbox labelKey=(theme-prefix 'darkmode.enable_dark_mode') checked=model.enableDarkMode}}
+  {{/if}}
+{{/if}}
