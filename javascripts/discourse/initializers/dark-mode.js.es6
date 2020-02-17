@@ -14,6 +14,7 @@ export default {
 			const browserInDarkMode = window.matchMedia(
 				"(prefers-color-scheme: dark)"
 			);
+
 			const themes = Discourse.Site._current.user_themes;
 
 			function defaultThemeId() {
@@ -43,14 +44,15 @@ export default {
 			}
 
 			function toggleDarkTheme(e) {
+				if (!currentUser) return;
+
 				const darkThemeId = parseInt(settings.dark_theme_id),
 					currentThemeId = themeSelector.currentThemeId();
 
 				if (
 					switchingDisabled() ||
 					!darkThemeId ||
-					defaultThemeId() === darkThemeId ||
-					!currentUser
+					defaultThemeId() === darkThemeId
 				) {
 					return;
 				}
