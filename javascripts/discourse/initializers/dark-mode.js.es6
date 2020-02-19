@@ -1,6 +1,7 @@
 import themeSelector from "discourse/lib/theme-selector";
 import { withPluginApi } from "discourse/lib/plugin-api";
 import showModal from "discourse/lib/show-modal";
+import Site from "discourse/models/site";
 
 export default {
 	name: "discourse-dark-mode",
@@ -15,7 +16,7 @@ export default {
 				"(prefers-color-scheme: dark)"
 			);
 
-			const themes = Discourse.Site._current.user_themes;
+			const themes = Site._current.user_themes;
 
 			function defaultThemeId() {
 				let default_theme = themes.filter(theme => theme.default === true)[0];
